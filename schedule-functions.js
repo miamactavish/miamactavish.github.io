@@ -1,13 +1,6 @@
 // Change the return value to simulate different days/times
 function today() {
     var day = new Date();
-
-    // TEST DATA
-    day.setDate(day.getDate() + 1);
-    day.setHours(8);
-    day.setMinutes(day.getMinutes() - 29);
-    // END TEST DATA
-
     return day;
 }
 
