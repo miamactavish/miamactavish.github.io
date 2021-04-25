@@ -80,7 +80,6 @@ function saveCookie() {
     document.cookie = day + "links" + "=" + links;
 
     document.cookie = "expires=1 Jul 2022 12:00:00 UTC";
-    document.cookie = "domain=127.0.0.1";
 }
 
 // Get an individual key's values from the saved cookie
