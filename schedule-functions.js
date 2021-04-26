@@ -8,7 +8,11 @@ function updateCurrentTime() {
     var y = setInterval(function() {
         // Update the string that shows the current time
         var now = today();
-        document.getElementById('weekday').innerHTML = "It is currently " + now.getHours() + ":" + now.getMinutes() + " on " + getWeekday() + ".";
+
+        hours = now.getHours().toLocaleString('en-US', {minimumIntegerDigits: 2});
+        minutes = now.getMinutes().toLocaleString('en-US', {minimumIntegerDigits: 2});
+
+        document.getElementById('weekday').innerHTML = "It is currently " + hours + ":" + minutes + " on " + getWeekday() + ".";
     }, 1000);
 }
 
@@ -26,6 +30,13 @@ function getWeekday() {
 
     var n = weekday[d.getDay()];
     return n;
+}
+
+function testPopups() {
+    var x = setInterval(function() {
+        clearInterval(x);
+        window.open('https://renertschool.ca/', '_blank')
+    }, 50);
 }
 
 function setTableDay(day) 
