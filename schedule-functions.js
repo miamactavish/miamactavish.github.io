@@ -52,6 +52,7 @@ function saveAndReload() {
 function saveCookie() {
     day = document.getElementById("timetable").getAttribute("curDay");
 
+    console.log("Hello?");
     var classes = "";
     var teachers = "";
     var links = "";
@@ -114,6 +115,7 @@ function loadCookie(day)
 
         var cells = rows[j].cells;
 
+    
         // Classes
         if (classes[j-1] == undefined) {
             cells[2].innerHTML = "";
@@ -147,19 +149,15 @@ function toggleEdit() {
 
     var table = document.getElementById("timetable");
     
-    for (let i in table.rows) {
+    for (var i = 1; i < table.rows.length; i++) {
         let row = table.rows[i]
         //iterate through rows
         //rows would be accessed using the "row" variable assigned in the for loop
-        for (let j in row.cells) {
+        for (let j = 2; j < row.cells.length; j++) {
             let col = row.cells[j]
-            //iterate through columns
-            //columns would be accessed using the "col" variable assigned in the for loop
-            //col.innerHTML = "Hi"
+            col.contentEditable = true;
         }  
     }
-
-    table.contentEditable = true;
 }
 
 function getListOfTimes() 
