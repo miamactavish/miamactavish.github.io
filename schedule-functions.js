@@ -60,7 +60,6 @@ function saveAndReload() {
 function saveStored() {
     day = document.getElementById("timetable").getAttribute("curDay");
 
-    console.log("Hello?");
     var classes = "";
     var teachers = "";
     var links = "";
@@ -72,9 +71,9 @@ function saveStored() {
 
         var cells = rows[j].children;
 
-        classes += cells[2].innerHTML + ",";
-        teachers += cells[3].innerHTML + ",";
-        links += cells[4].innerHTML + ",";
+        classes += cells[2].textContent + ",";
+        teachers += cells[3].textContent + ",";
+        links += cells[4].textContent + ",";
     }
 
     localStorage.setItem(day + "teachers", teachers);
