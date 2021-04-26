@@ -44,20 +44,20 @@ function setTableDay(day)
         }
     }
 
-    loadCookie(day);
+    loadStored(day);
 }
 
 function changeDay(day) {
-    saveCookie();
+    saveStored();
     setTableDay(day);
 }
 
 function saveAndReload() {
-    saveCookie();
+    saveStored();
     location.reload();
 }
 
-function saveCookie() {
+function saveStored() {
     day = document.getElementById("timetable").getAttribute("curDay");
 
     console.log("Hello?");
@@ -77,39 +77,27 @@ function saveCookie() {
         links += cells[4].innerHTML + ",";
     }
 
-    document.cookie = day + "teachers" + "=" + teachers;
-    document.cookie = day + "classes" + "=" + classes;
-    document.cookie = day + "links" + "=" + links;
-
-    document.cookie = "expires=1 Jul 2022 12:00:00 UTC";
+    localStorage.setItem(day + "teachers", teachers);
+    localStorage.setItem(day + "classes", classes);
+    localStorage.setItem(day + "links", links);
 }
 
-// Get an individual key's values from the saved cookie
-function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
+// Get an individual item from local storage
+function getStored(cname) {
 
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i < ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
+    if (localStorage.getItem(cname) != null) {
+        return localStorage.getItem(cname);
     }
-    // Not found
+    // Return empty string if it hasn't been created yet
     return "";
   }
 
-function loadCookie(day) 
+function loadStored(day) 
 {
-    console.log(document.cookie);
-    // Load all data for current day from cookie
-    var teachers = getCookie(day + "teachers");
-    var classes = getCookie(day + "classes");
-    var links = getCookie(day + "links");
+    // Load all data for current day from local storage
+    var teachers = getStored(day + "teachers");
+    var classes = getStored(day + "classes");
+    var links = getStored(day + "links");
 
     teachers = teachers.split(",");
     classes = classes.split(",");
@@ -118,7 +106,7 @@ function loadCookie(day)
     var table = document.getElementById("timetable");
     var rows = table.getElementsByTagName("tr");
 
-    // Populate table with data from cookie
+    // Populate table with data from local storage
     for (var j = 1; j < rows.length; j++) {
 
         var cells = rows[j].cells;
@@ -187,10 +175,10 @@ function getListOfTimes()
 function getNextClass() 
 {
     day = getWeekday();
-    // Assemble schedule data from cookie
-    var teachers = getCookie(day + "teachers");
-    var classes = getCookie(day + "classes");
-    var links = getCookie(day + "links");
+    // Assemble schedule data from local storage
+    var teachers = getStored(day + "teachers");
+    var classes = getStored(day + "classes");
+    var links = getStored(day + "links");
 
     teachers = teachers.split(",");
     classes = classes.split(",");
