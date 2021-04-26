@@ -4,6 +4,14 @@ function today() {
     return day;
 }
 
+function updateCurrentTime() {
+    var y = setInterval(function() {
+        // Update the string that shows the current time
+        var now = today();
+        document.getElementById('weekday').innerHTML = "It is currently " + now.getHours() + ":" + now.getMinutes() + " on " + getWeekday() + ".";
+    }, 1000);
+}
+
 // Get string representation of the current day
 function getWeekday() {
     var d = today();
