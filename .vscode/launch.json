@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Local launch",
             "request": "launch",
@@ -17,7 +18,11 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://127.0.0.1:8000/TVs%20-%20Renert%20School.html",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}",
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "!**/node_modules/**"
+            ]
         }
     ]
 }
