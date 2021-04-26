@@ -233,6 +233,7 @@ function countdown() {
 
     if (next == undefined) {
         var infoString = "No more classes today! If you're missing a class, please add it in the schedule below.";
+        document.getElementById("classinfo").innerHTML = "";
         document.getElementById("countdownintro").innerHTML = "";
         document.getElementById("countdown").innerHTML = infoString;
         return;
