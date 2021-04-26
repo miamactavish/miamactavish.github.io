@@ -33,10 +33,19 @@ function getWeekday() {
 }
 
 function testPopups() {
+    if (localStorage.getItem("popuptest") == "1") {
+        window.open('https://renertschool.ca/', '_blank')
+        localStorage.setItem("popuptest", "0");
+    }
+
+}
+
+function enableTestPopups() {
     var x = setInterval(function() {
         clearInterval(x);
-        window.open('https://renertschool.ca/', '_blank')
     }, 50);
+    localStorage.setItem("popuptest", "1");
+    location.reload();
 }
 
 function setTableDay(day) 
