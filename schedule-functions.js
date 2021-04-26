@@ -194,7 +194,7 @@ function getNextClass()
         // If this period hasn't happened yet
         if (time - now > 0) {
             var str = links[i];
-            if (str == undefined || !str.includes("https://zoom.us/")) {
+            if (str == undefined || !str.includes("zoom.us/")) {
                 continue;
             }
             var nextClass = [];
