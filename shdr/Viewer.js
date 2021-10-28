@@ -19,18 +19,24 @@ var Viewer = (function() {
     this.renderer = new THREE.WebGLRenderer({
       antialias: true
     });
+    this.renderer.setClearColor(new THREE.Color("rgb(196, 208, 242)"));
+
     this.canvas = this.renderer.domElement;
 
     this.dom.appendChild(this.canvas);
     shdr.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(45, this.dom.clientWidth / this.dom.clientHeight, 0.1, 100000);
+    this.orthoCamera = new THREE.OrthographicCamera(4.0 / -2, 4.0 / 2,  4.0 / -2, 4.0 / 2, 0.1, 1000);
     this.controls = new OrbitControls(this.camera, this.dom);
     shdr.scene.add(this.camera);
 
-    this.vs = window.shdr.Snippets.DefaultVertex;
-    this.fs = window.shdr.Snippets.DefaultFragment;
+    // Setup for rendering to texture
+    this.bufferScene = new THREE.Scene();
+    this.bufferTexture = new THREE.WebGLRenderTarget(this.dom.clientWidth, this.dom.clientHeight);
 
-    // manager
+
+    this.vs = window.shdr.Snippets.BlinnPhongVertex;
+    this.fs = window.shdr.Snippets.BlinnPhongFragment;
 
     shdr.material = this.defaultMaterial();
 
@@ -42,29 +48,21 @@ var Viewer = (function() {
         //if ( child.isMesh ) child.material.map = material;
       } );
 
-      //shdr.scene.add( this.object );
-
       var key = "models/sphere.obj";
       var geo = shdr.object;
-      console.log("initializing");
       var data, old;
       this.currentModel = key;
       data = window.shdr.Models[key];
       if (shdr.model != null) {
         old = shdr.model.geometry;
         shdr.scene.remove(shdr.model);
-        console.log("removed)");
         //old.dispose();
       }
-      console.log(geo);
       shdr.model = geo;
-      if (data != null) {
-        if (data.scale != null) {
-          shdr.model.scale.set(data.scale, data.scale, data.scale);
-        }
+      if (data != null && data.scale != null) {
+        shdr.model.scale.set(data.scale, data.scale, data.scale);
       }
       shdr.scene.add(shdr.model);
-      //return this.app.ui.hideModelLoader();
     }
 
     this.manager = new THREE.LoadingManager( loadModel );
@@ -83,11 +81,7 @@ var Viewer = (function() {
     const texture = textureLoader.load( 'textures/beanie.jpg' );
     
     this.objLoader = new OBJLoader( this.manager );
-    /*
-    this.objLoader.load( 'models/sphere.obj', function ( obj ) {
-      shdr.object = obj;
-    }, onProgress, onError );
-*/
+
     this.loadModel('models/sphere.obj');
 
     this.onResize();
@@ -102,11 +96,15 @@ var Viewer = (function() {
     this.controls.update();
     this.time += 0.001;
     
-    //this.uniforms.time.value = this.time;
+    this.uniforms.time.value = this.time;
     if (shdr.model && this.rotate) {
       shdr.model.rotation.y += this.rotateRate;
     }
 
+    // render to texture
+    //this.renderer.render(shdr.scene, this.camera, this.bufferTexture);
+
+    //return this.renderer.render(shdr.scene, this.orthoCamera);
     return this.renderer.render(shdr.scene, this.camera);
   };
 
@@ -134,35 +132,12 @@ var Viewer = (function() {
     this.objLoader.load(key, (function(obj) {
       
       shdr.object = obj;
-      console.log("loading");
-      return function(geo) {
-      //  return _this.initModel(geo, key);
-      };
     }));
-
-    //return this.app.ui.showModelLoader();
   };
 
-  Viewer.prototype.initModel = function(geo, key) {
-    console.log("initializing");
-    var data, old;
-    this.currentModel = key;
-    data = window.shdr.Models[key];
-    if (shdr.model != null) {
-      old = shdr.model.geometry;
-      shdr.scene.remove(shdr.model);
-      old.dispose();
-    }
-    console.log(geo);
-    console.dir(geo);
-    shdr.model = geo;
-    if (data != null) {
-      if (data.scale != null) {
-        shdr.model.scale.set(data.scale, data.scale, data.scale);
-      }
-    }
-    shdr.scene.add(shdr.model);
-    return this.app.ui.hideModelLoader();
+  Viewer.prototype.initModel = function(geo, key) 
+  {
+    this.loadModel(key);
   };
 
   Viewer.prototype.updateShader = function(shader, mode) {
@@ -307,7 +282,7 @@ var Viewer = (function() {
 
   Viewer.prototype.defaultMaterial = function() {
     this.resetUniforms();
-    //this.addCustomUniforms(this.parseUniforms(shdr.Snippets.DefaultUniforms));
+    this.addCustomUniforms(this.parseUniforms(shdr.Snippets.DefaultUniforms));
     
     return new THREE.RawShaderMaterial( {
 
@@ -316,6 +291,19 @@ var Viewer = (function() {
       fragmentShader: this.fs
     } );
   };
+
+  Viewer.prototype.bufferMaterial = function() {
+    this.resetUniforms();
+    this.addCustomUniforms(this.parseUniforms(shdr.Snippets.BufferUniforms));
+    
+    return new THREE.RawShaderMaterial( {
+
+      uniforms: this.uniforms,
+      vertexShader: shdr.Snippets.DefaultVertex,
+      fragmentShader: shdr.Snippets.DefaultFragment
+    } );
+  };
+
 
   return Viewer;
 
