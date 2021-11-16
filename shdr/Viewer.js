@@ -3,11 +3,13 @@ import { OBJLoader } from '../libs/threejs/examples/jsm/loaders/OBJLoader.js';
 import { OrbitControls } from '../libs/threejs/examples/jsm/controls/OrbitControls.js';
 
 var Viewer = (function() {
-  Viewer.FRAGMENT = 0;
+  Viewer.VERTEX = 0;
 
-  Viewer.VERTEX = 1;
+  Viewer.FRAGMENT = 1;
 
-  Viewer.UNIFORMS = 2;
+  Viewer.POST = 2;
+
+  Viewer.UNIFORMS = 3;
 
   function Viewer(dom, app) {
     this.dom = dom;
@@ -25,27 +27,37 @@ var Viewer = (function() {
 
     this.dom.appendChild(this.canvas);
     shdr.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, this.dom.clientWidth / this.dom.clientHeight, 0.1, 100000);
-    this.orthoCamera = new THREE.OrthographicCamera(4.0 / -2, 4.0 / 2,  4.0 / -2, 4.0 / 2, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(45, this.dom.clientWidth / this.dom.clientHeight, 0.1, 1000);
     this.controls = new OrbitControls(this.camera, this.dom);
-    shdr.scene.add(this.camera);
 
     // Setup for rendering to texture
-    this.bufferScene = new THREE.Scene();
-    this.bufferTexture = new THREE.WebGLRenderTarget(this.dom.clientWidth, this.dom.clientHeight);
+    shdr.bufferScene = new THREE.Scene();
 
+    this.bufferTexture = new THREE.WebGLRenderTarget(this.dom.clientWidth, this.dom.clientHeight);
+    this.bufferTexture.depthBuffer = true;
+		this.bufferTexture.depthTexture = new THREE.DepthTexture(this.dom.clientWidth, this.dom.clientHeight);
+    this.orthoCamera = new THREE.OrthographicCamera( this.dom.clientWidth / - 2, this.dom.clientWidth / 2, this.dom.clientHeight / 2, this.dom.clientHeight / - 2, -1, 1000 );
 
     this.vs = window.shdr.Snippets.BlinnPhongVertex;
     this.fs = window.shdr.Snippets.BlinnPhongFragment;
 
-    shdr.material = this.defaultMaterial();
+    // Shaders for buffer
+    this.bvs = window.shdr.HiddenSnippets.TextureVertex;
+    this.bfs = window.shdr.Snippets.TextureFragment;
 
+    shdr.material = this.defaultMaterial();
+    shdr.bufferMaterial = this.bufferMaterial();
+
+    const geometry = new THREE.PlaneGeometry(this.dom.clientWidth, this.dom.clientHeight);
+    const material = shdr.bufferMaterial;
+    const plane = new THREE.Mesh( geometry, material );
+    shdr.bufferScene.add( plane );
+    
     function loadModel() {
 
       shdr.object.traverse( function ( child ) {
 
         if ( child.isMesh ) child.material = shdr.material;
-        //if ( child.isMesh ) child.material.map = material;
       } );
 
       var key = "models/sphere.obj";
@@ -101,11 +113,15 @@ var Viewer = (function() {
       shdr.model.rotation.y += this.rotateRate;
     }
 
-    // render to texture
-    //this.renderer.render(shdr.scene, this.camera, this.bufferTexture);
+    this.renderer.setRenderTarget(this.bufferTexture);
+    this.renderer.render(shdr.scene, this.camera);
+    this.renderer.setRenderTarget(null);
 
-    //return this.renderer.render(shdr.scene, this.orthoCamera);
-    return this.renderer.render(shdr.scene, this.camera);
+    //shdr.bufferMaterial.uniforms.tex.value = this.bufferTexture.texture;
+    //shdr.bufferMaterial.uniforms.depth_buffer.value = this.bufferTexture.depthTexture;
+		//postMaterial.uniforms.tDepth.value = target.depthTexture;
+
+    return this.renderer.render(shdr.bufferScene, this.orthoCamera);
   };
 
   Viewer.prototype.reset = function() {
@@ -147,6 +163,10 @@ var Viewer = (function() {
     if (mode === Viewer.FRAGMENT) {
       this.fs = shader;
       shdr.material.fragmentShader = shader;
+    } else if (mode === Viewer.POST) {
+      this.bfs = shader;
+      shdr.bufferMaterial.fragmentShader = shader;
+      return shdr.bufferMaterial.needsUpdate = true;
     } else if (mode === Viewer.UNIFORMS) {
       this.resetUniforms();
       this.addCustomUniforms(this.parseUniforms(shader));
@@ -167,6 +187,23 @@ var Viewer = (function() {
       resolution: {
         type: 'v2',
         value: new THREE.Vector2(this.dom.clientWidth, this.dom.clientHeight)
+      }
+    };
+  };
+
+  Viewer.prototype.resetBufferUniforms = function() {
+    return this.uniforms = {
+      time: {
+        type: 'f',
+        value: this.time
+      },
+      resolution: {
+        type: 'v2',
+        value: new THREE.Vector2(this.dom.clientWidth, this.dom.clientHeight)
+      },
+      tex: {
+        type: 'sampler2D',
+        value: this.bufferTexture.texture,
       }
     };
   };
@@ -280,6 +317,46 @@ var Viewer = (function() {
     return results;
   };
 
+  Viewer.prototype.bufferMaterial = function() {
+    this.resetBufferUniforms();
+    //this.addCustomUniforms(this.parseUniforms(shdr.Snippets.DefaultUniforms));
+    
+     var uni = {
+      time: {
+        type: 'f',
+        value: this.time
+      },
+      resolution: {
+        type: 'v2',
+        value: new THREE.Vector2(this.dom.clientWidth, this.dom.clientHeight)
+      },
+      tex: {
+        type: 'sampler2D',
+        value: this.bufferTexture.texture,
+      },
+      depth_buffer: {
+        type: 'sampler2D',
+        value: this.bufferTexture.depthTexture,
+      },
+      width: {
+        type: 'f',
+        value: this.dom.clientWidth,
+      },
+      height: {
+        type: 'f',
+        value: this.dom.clientHeight,
+      },
+    };
+
+    return new THREE.RawShaderMaterial( {
+
+      uniforms: uni,
+      vertexShader: this.bvs,
+      fragmentShader: this.bfs
+    } );
+
+  };
+
   Viewer.prototype.defaultMaterial = function() {
     this.resetUniforms();
     this.addCustomUniforms(this.parseUniforms(shdr.Snippets.DefaultUniforms));
@@ -291,19 +368,6 @@ var Viewer = (function() {
       fragmentShader: this.fs
     } );
   };
-
-  Viewer.prototype.bufferMaterial = function() {
-    this.resetUniforms();
-    this.addCustomUniforms(this.parseUniforms(shdr.Snippets.BufferUniforms));
-    
-    return new THREE.RawShaderMaterial( {
-
-      uniforms: this.uniforms,
-      vertexShader: shdr.Snippets.DefaultVertex,
-      fragmentShader: shdr.Snippets.DefaultFragment
-    } );
-  };
-
 
   return Viewer;
 

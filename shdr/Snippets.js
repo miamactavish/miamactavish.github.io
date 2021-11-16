@@ -7,9 +7,16 @@ var Snippets = {
   'DemoFragment': ['precision highp float;', '', 'uniform float time;', 'uniform vec2 resolution;', '', 'uniform mat4 modelViewMatrix;', 'uniform mat4 projectionMatrix;', '', 'void main()', '{', '  vec2 pixel = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;', '  pixel.x *= resolution.x/resolution.y;', '  gl_FragColor = vec4(pixel,.0,1.);', '}'].join('\n'),
   'ExtractCameraPosition': ['vec3 ExtractCameraPos(mat4 a_modelView)', '{', '  mat3 rotMat =mat3(a_modelView[0].xyz,a_modelView[1].xyz,a_modelView[2].xyz);', '  vec3 d =  a_modelView[3].xyz;', '  vec3 retVec = -d * rotMat;', '  return retVec;', '}'].join('\n'),
   'GetDirection': ['vec3 getDirection(vec3 origine, vec2 pixel)', '{', '  vec3 ww = normalize(vec3(0.0) - origine);', '  vec3 uu = normalize(cross( vec3(0.0,1.0,0.0), ww ));', '  vec3 vv = normalize(cross(ww,uu));', '  return normalize( pixel.x*uu + pixel.y*vv + 1.5*ww );', '}'].join('\n'),
-  'ColorNormal': ['vec3 colorNormal(vec3 col1, vec3 col2, vec3 col3)', '{', '  vec3 n = normalize(fNormal);', '  return clamp(col1*n.x + col2*n.y + col3*n.z,', '              vec3(0.0), vec3(1.0));', '}'].join('\n'),
-  'Rimlight': ['vec3 rim(vec3 color, float start, float end, float coef)', '{', '  vec3 normal = normalize(fNormal);', '  vec3 eye = normalize(-fPosition.xyz);', '  float rim = smoothstep(start, end, 1.0 - dot(normal, eye));', '  return clamp(rim, 0.0, 1.0) * coef * color;', '}'].join('\n'),
 
+  'TextureFragment': `precision highp float;
+uniform sampler2D tex;
+varying vec2 fPosition;
+varying vec2 fUv;
+
+void main()
+{
+  gl_FragColor = texture2D(tex, fUv);
+}`,
   'BlinnPhongFragment': `precision highp float;
 uniform float time;
 uniform vec2 resolution;
@@ -60,7 +67,7 @@ void main()
   gl_FragColor = vec4((ambient + diffuse) * color + (specular * lightColor), 1.0);
 
 }`,
-  'BlinnPhongVertex': `precision highp float;
+'BlinnPhongVertex': `precision highp float;
 attribute vec3 position;
 attribute vec3 normal;
 uniform mat3 normalMatrix;
@@ -78,9 +85,60 @@ void main()
   vec4 pos = modelViewMatrix * vec4(position, 1.0);
   fPosition = pos.xyz;
   gl_Position = projectionMatrix * pos;
-}`
+}`,
+'ViewDepthBuffer': `precision highp float;
+uniform sampler2D depth_buffer;
+varying vec2 fPosition;
+varying vec2 fUv;
+
+float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
+  return ( viewZ + near ) / ( near - far );
+}
+
+float perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {
+  return ( near * far ) / ( ( far - near ) * invClipZ - far );
+}
+
+float readDepth( sampler2D depthSampler, vec2 coord ) {
+  float cameraNear = 0.1;
+  float cameraFar = 100.0;
+	float fragCoordZ = texture2D( depthSampler, coord ).x;
+
+	float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
+
+	return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
+}
+
+void main() {
+	float depth = readDepth( depth_buffer, fUv );
+
+	gl_FragColor.rgb = 1.0 - vec3( depth );
+	gl_FragColor.a = 1.0;
+}`,
   
 };
 
 window.shdr.Snippets = Snippets;
 
+var hiddenSnippets = {
+  'TextureVertex': `precision highp float;
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 uv;
+uniform mat3 normalMatrix;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+varying vec2 fUv;
+varying vec2 fPosition;
+
+void main()
+{
+  fUv = uv;
+  vec4 pos = modelViewMatrix * vec4(position, 1.0);
+  fPosition = pos.xy;
+  gl_Position = projectionMatrix * pos;
+}`,
+}
+
+window.shdr.HiddenSnippets = hiddenSnippets;
