@@ -56,18 +56,65 @@ function submit() {
     win();
   }
   else {
-    document.getElementById("answer").innerHTML="Incorrect. Try again.";
+    var has_correct = false;
+    var message = "";
+    if (one) {
+      message += "Password one is correct.\n"
+      has_correct = true;
+    }
+    else {
+      document.getElementById('one').value = "";
+    }
+    if (two) {
+      message += "Password two is correct.\n"
+      has_correct = true;
+    }
+    else {
+      document.getElementById('two').value = "";
+    }
+    if (three) {
+      message += "Password three is correct.\n"
+      has_correct = true;
+    }
+    else {
+      document.getElementById('three').value = "";
+    }
+
+    if (four) {
+      message += "Password four is correct.\n"
+      has_correct = true;
+    }
+    else {
+      document.getElementById('four').value = "";
+    }
+
+    if (five) {
+      message += "Password five is correct.\n"
+      has_correct = true;
+    }
+    else {
+      document.getElementById('five').value = "";
+    }
+
+    if (!has_correct) {
+      document.getElementById("answer").innerHTML="Your passwords are all either incorrect or entered in the wrong password box. Please try again.";
+
+    }
+    else {
+      document.getElementById("answer").innerHTML=message;
+    }
   }
 }
 
 function clear_button() {
-  document.getElementById("answer").innerHTML="clear";
-
   document.getElementById('one').value = "";
   document.getElementById('two').value = "";
   document.getElementById('three').value = "";
   document.getElementById('four').value = "";
   document.getElementById('five').value = "";
+
+  document.getElementById("answer").innerHTML="";
+
 }
 
 function win() {
@@ -80,6 +127,14 @@ function win() {
   var timeMessage = "You cleared the room at exactly " + time + ".";
 
   document.getElementById("showtime").innerHTML=timeMessage;  
+}
+
+function incorrect() {
+  document.getElementById('one').value = "";
+  document.getElementById('two').value = "";
+  document.getElementById('three').value = "";
+  document.getElementById('four').value = "";
+  document.getElementById('five').value = "";
 }
 
 </script>
