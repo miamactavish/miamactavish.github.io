@@ -50,7 +50,7 @@ function submit() {
   var four = (hash == "bc13241e33288fd05283676935078ed3");
 
   hash = md5(document.getElementById('five').value.toLowerCase());
-  var five = (hash == "82bb22fa076ddb3f20558e9620427e06");
+  var five = ((hash == "82bb22fa076ddb3f20558e9620427e06") || (hash == "26b37779b82a8328c83d9fb65efe51ab"));
 
   if (one && two && three && four && five) {
     win();
