@@ -1,3 +1,7 @@
+ .u-section-1 {
+  --color-var: #1a1a1a;
+}
+
 .u-section-1 .u-sheet-1 {
   min-height: 510px;
 }

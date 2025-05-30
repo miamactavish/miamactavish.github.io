@@ -46766,6 +46766,7 @@ a.u-link.u-text-hover-color-var:hover {
 /*end-variables sitestylecss*/
  .u-header {
   background-image: none;
+  --color-var: #1a1a1a;
 }
 
 .u-header .u-sheet-1 {

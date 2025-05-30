@@ -1,3 +1,7 @@
+ .u-section-1 {
+  --color-var: #1a1a1a;
+}
+
 .u-section-1 .u-sheet-1 {
   min-height: 92px;
 }
@@ -5,7 +9,11 @@
 .u-section-1 .u-text-1 {
   margin-bottom: 20px;
   margin-top: 20px;
-}.u-section-2 .u-sheet-1 {
+} .u-section-2 {
+  --color-var: #1a1a1a;
+}
+
+.u-section-2 .u-sheet-1 {
   min-height: 851px;
 }
 
