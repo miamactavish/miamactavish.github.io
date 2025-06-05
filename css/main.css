@@ -76,7 +76,7 @@ body {
   background: #191919;
 }
 
-#editor, #viewer, #footer { 
+#editor, #viewer, #shdr-footer { 
   margin: 0;
   position: absolute;
   top: 0;
