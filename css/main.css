@@ -1,4 +1,4 @@
-body {
+.shdr body {
   overflow: hidden;
   font-family: "Ubuntu sans", Arial, sans-serif;
   font-size: 14px;
@@ -235,7 +235,7 @@ body {
   height: 34px;
 }
 
-button::-moz-focus-inner {
+.shdr button::-moz-focus-inner {
   border: 0;
 }
 
@@ -422,7 +422,7 @@ button::-moz-focus-inner {
   background: #ff0000 !important;
 }
 
-button {
+.shdr button {
   position: relative;
 }
 
