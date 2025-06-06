@@ -78,21 +78,23 @@
     <section class="u-clearfix u-color-var u-section-1" id="block-1">
       <div class="u-clearfix u-sheet u-sheet-1">
         <h1 class="u-custom-font u-font-raleway u-text u-text-custom-color-2 u-text-default u-title u-text-1">Shader Educational Tool </h1>
-        <p class="u-text u-text-body-alt-color u-text-default u-text-2">This is a tool forked from <a href="https://github.com/BKcore/Shdr" class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-palette-1-base u-btn-1">BKcore's Shdr project</a>, which is an online tool that allows viewing and editing of OpenGL shaders via WebGL. This project was adapted for an advanced computer science course delivered at the high-school level, in its Computer Graphics unit. I made various modifications to the original project, including:<br>
+        <p class="u-text u-text-body-alt-color u-text-default u-text-2">This is a tool forked from <a href="https://github.com/BKcore/Shdr" class="u-active-none u-border-none u-btn u-button-link u-button-style u-hover-none u-none u-text-palette-1-base u-btn-1">BKcore's Shdr project</a>, which is an online tool that allows viewing and live editing of OpenGL shaders via WebGL. This project was adapted for an advanced computer science course delivered at the high-school level, in its Computer Graphics unit. I made various modifications to the original project, including the abilities to:<br>
           <br>
           <br>
         </p>
         <ul class="u-text u-text-default u-text-3">
-          <li>Ability to upload, and modify shaders for, 3D models in .obj format. Supports switching between different 3D models at runtime</li>
-          <li>Ability to apply postprocessing effects</li>
+          <li>Upload and modify shaders for 3D models in .obj format. Supports switching between different 3D models at runtime</li>
+          <li>Apply postprocessing effects using buffers</li>
+          <li>Upload and apply custom textures</li>
         </ul>
-        <p class="u-text u-text-body-alt-color u-text-default u-text-4">For this unit's assignment, students were tasked with implementing Gooch shading. Here is the assignment content:<br>(Under Construction)<br>
+        <p class="u-text u-text-body-alt-color u-text-default u-text-4">For this unit's assignment, students were tasked with implementing <a href="https://en.wikipedia.org/wiki/Gooch_shading">Gooch shading</a>. The original assignment can be viewed <a href="CS3_Assignment_1__Shaders.pdf">here.</a><br>
           <br>
+          Below is the editor - note that it is untested on mobile platforms.
         </p>
       </div>
       <!-- begin code ported from shader-->
             <!-- inline preloader -->
-      <div id="shdr-container" class="shdr" style="position:relative; height: 700px;width:90%">
+      <div id="shdr-container" class="shdr" style="position:relative; height:700px; width:90%; margin:auto;">
       <div id="main-loader" style="position: absolute; z-index: 10000; top: 0; bottom: 0; left: 0; right: 0; background: #000; color: #000; font-family: Arial, 'Ubuntu sans', sans-serif; font-size: 32px; font-weight: bold;">
         <div style="position: absolute; z-index: 10001; top: 50%; left: 0; width: 100%; background: #191919; text-align: center; line-height: 60px; margin-top: -30px; border-top: 1px solid #333; border-bottom: 1px solid #333;">
           <img src="img/loader.gif" height="32" width="32" alt="Loading..." style="margin-bottom: -4px"> Loading...
@@ -178,7 +180,6 @@
         </div>
         <div id="panel-right">
           <div id="viewer"></div>
-          <div id="shdr">Shdr</div>
           <div id="model-loader">
             <img src="img/loader.gif" height="32" width="32" alt="Loading model...">
           </div>
